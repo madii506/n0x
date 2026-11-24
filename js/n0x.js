@@ -29,12 +29,11 @@ function boot() {
   document.body.classList.add('lock');
   import('./scene.js').then(m => m.createScene($('#scene'), { mobile })).then(s => { scene = s; window.__n0x = s; if (introDone) s.intro(); }).catch(() => { });
   if (reduce || location.hash) { endIntro(); return; }
-  const t0 = performance.now(), DUR = 3000, el = $('#inType');
+  const t0 = performance.now(), DUR = 2700, el = $('#inType');
   (function tick() {
     if (introDone) return;
     const k = Math.min(1, (performance.now() - t0) / DUR);
-    $('#inBar').style.width = (k * 100) + '%';
-    el.textContent = LINE.slice(0, Math.floor(Math.max(0, Math.min(1, (k - 0.3) / 0.55)) * LINE.length));
+    el.textContent = LINE.slice(0, Math.floor(Math.max(0, Math.min(1, (k - 0.32) / 0.5)) * LINE.length));
     if (k < 1) requestAnimationFrame(tick); else setTimeout(endIntro, 250);
   })();
   setTimeout(endIntro, 4800);           // backstop
@@ -47,7 +46,7 @@ const nav = $('#nav'), links = $$('#nav .links a'), secs = links.map(a => $(a.ge
 function onScroll() {
   const y = scrollY, vh = innerHeight;
   nav.classList.toggle('solid', y > 40);
-  if (scene) { scene.setScroll(y / vh); scene.pause(y > vh * 1.3); }
+  if (scene) scene.setScroll(y / Math.max(1, document.documentElement.scrollHeight - vh));
   let on = -1; secs.forEach((s, i) => { if (s && s.getBoundingClientRect().top < vh * 0.4) on = i; });
   links.forEach((a, i) => a.classList.toggle('on', i === on));
 }
@@ -267,7 +266,7 @@ const io2 = new IntersectionObserver(es => es.forEach(e => {
   if (t.classList.contains('vs')) { t.classList.add('vis'); $$('.vr b.w', t).forEach((b, i) => setTimeout(() => scramble(b, b.dataset.t || b.textContent, 700), 500 + i * 160)); }
 }), { threshold: 0.35 });
 $$('.eb, .vs b.w').forEach(e => e.dataset.t = e.textContent);
-$$('.eb, #graph2, .vs').forEach(e => io2.observe(e));
+$$('.eb').forEach(e => io2.observe(e));
 // scroll progress + the pinned steps
 const how = $('#how'), lis = $$('#slist li'), imgs = $$('#stage img');
 let stepNow = -1;
@@ -314,3 +313,89 @@ async function ticker() {
   } catch (e) { }
 }
 ticker(); setInterval(() => { if (!document.hidden) ticker(); }, 20000);
+
+/* ===== v3: the journey ===== */
+const fine = matchMedia('(hover: hover) and (pointer: fine)').matches && !reduce;
+const clamp = (x, a = 0, b = 1) => Math.max(a, Math.min(b, x));
+const maxY = () => document.documentElement.scrollHeight - innerHeight;
+// weighted scrolling on wheels (touch stays native)
+const SM = { y: scrollY, t: scrollY, on: false };
+function sstep() {
+  const d = SM.t - SM.y;
+  if (Math.abs(d) < 0.4) { SM.y = SM.t; scrollTo(0, SM.t); SM.on = false; return; }
+  SM.y += d * 0.085; scrollTo(0, SM.y); requestAnimationFrame(sstep);
+}
+function glide(to) { SM.t = clamp(to, 0, maxY()); if (!SM.on) { SM.y = scrollY; SM.on = true; requestAnimationFrame(sstep); } }
+if (fine) addEventListener('wheel', e => {
+  if (e.ctrlKey || document.body.classList.contains('lock') || !$('#wModal').hidden) return;
+  if (e.target.closest && e.target.closest('select, textarea, .ptable')) return;
+  e.preventDefault(); glide((SM.on ? SM.t : scrollY) + e.deltaY * (e.deltaMode === 1 ? 32 : e.deltaMode === 2 ? innerHeight : 1));
+}, { passive: false });
+addEventListener('keydown', () => { SM.on = false; });
+$$('a[href^="#"]').forEach(a => a.addEventListener('click', e => {
+  const id = a.getAttribute('href'); const el = id.length > 1 && $(id); if (!el) return;
+  e.preventDefault(); glide(el.getBoundingClientRect().top + scrollY - (id === '#terminal' ? 20 : 0)); history.replaceState(null, '', id);
+}));
+// paragraphs light up word by word as you read
+$$('.lead, .big').forEach(el => { el.innerHTML = el.textContent.trim().split(/\s+/).map(w => `<span class="lw">${w}</span>`).join(' '); });
+const scrubText = $$('.lead, .big').map(el => ({ el, ws: $$('.lw', el), n: -1 }));
+// the kinetic rows
+const K1 = 'They can’t hunt what they can’t see.', K2 = 'No name · No link · No trace ·';
+$('#kin1').innerHTML = Array(6).fill(`<span>${K1}</span>`).join(''); $('#kin2').innerHTML = Array(8).fill(`<span>${K2}</span>`).join('');
+let kx1 = 0, kx2 = 0, kdir = 1;
+// graphs
+const g1 = $('#graph1'), g2 = $('#graph2'); g1.classList.add('scrub'); g2.classList.add('scrub');
+const g1e = $$('.edges .e', g1), g1n = $$('.nodes > *', g1);
+g1e.forEach(p => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; p._L = L; });
+const g2e = $$(':scope > path.e:not(.dash)', g2.querySelector('svg')); g2e.forEach(p => { const L = p.getTotalLength(); p.style.strokeDasharray = L; p.style.strokeDashoffset = L; p._L = L; });
+let ownerDone = false;
+const rows = $$('#see .vr'); rows.forEach(r => r._done = false);
+// cursor
+const curEl = $('#cur'); let ccx = -100, ccy = -100, ctx2 = -100, cty2 = -100;
+if (fine) {
+  addEventListener('pointermove', e => { ctx2 = e.clientX; cty2 = e.clientY; curEl.classList.add('on'); curEl.classList.toggle('big', !!(e.target.closest && e.target.closest('a, button, summary, select, input, label'))); }, { passive: true });
+  document.addEventListener('pointerleave', () => curEl.classList.remove('on'));
+}
+const heroIn = $('.hero-in'); setTimeout(() => heroIn.classList.add('live'), 2600);
+const prog = (el, a = 0.85, span = 0.6) => { const r = el.getBoundingClientRect(); return clamp((innerHeight * a - r.top) / (r.height * span + innerHeight * 0.2)); };
+let lastY = scrollY, vS = 0, skew = 0;
+(function loop() {
+  requestAnimationFrame(loop);
+  const y = scrollY, v = y - lastY; lastY = y; vS += (v - vS) * 0.2;
+  if (scene && scene.setVel) scene.setVel(vS);
+  // skew with speed, settle back
+  const sk = fine ? clamp(vS * 0.035, -2.2, 2.2) : 0; skew += (sk - skew) * 0.12;
+  document.documentElement.style.setProperty('--skew', skew.toFixed(3) + 'deg');
+  // hero drifts away as you leave it
+  if (introDone && heroIn.classList.contains('live')) { const p = clamp(y / (innerHeight * 0.85)); heroIn.style.transform = `translateY(${-p * 110}px) scale(${1 - p * 0.1})`; heroIn.style.opacity = String(1 - p * 1.2); }
+  // word light-up
+  for (const s of scrubText) {
+    const r = s.el.getBoundingClientRect(); if (r.bottom < -50 || r.top > innerHeight + 50) continue;
+    const big = s.el.classList.contains('big'), p = clamp((innerHeight * (big ? 0.78 : 0.9) - r.top) / (big ? innerHeight * 0.55 : r.height + innerHeight * 0.3));
+    const n = Math.round(p * s.ws.length); if (n !== s.n) { s.ws.forEach((w, i) => w.classList.toggle('on', i < n)); s.n = n; }
+  }
+  // problem graph draws itself, then the tracker goes live
+  { const p = prog($('#problem'), 0.75, 0.5);
+    g1e.forEach((e, i) => { const k = clamp((p - i * 0.07) / 0.35); e.style.strokeDashoffset = e._L * (1 - k); });
+    g1n.forEach((n, i) => n.classList.toggle('hide', p < 0.12 + (i % 10) * 0.045));
+    g1.classList.toggle('live', p > 0.82); }
+  // break graph: the line runs, gets cut, the owner disappears
+  { const p = prog($('#break'), 0.75, 0.5);
+    g2e.forEach(e => { e.style.strokeDashoffset = e._L * (1 - clamp(p / 0.4)); });
+    g2.classList.toggle('cut-on', p > 0.5);
+    if (p > 0.62 && !ownerDone) { ownerDone = true; scramble($('#ownerTxt'), 'owner: unknown', 900); }
+    if (p < 0.3 && ownerDone) { ownerDone = false; $('#ownerTxt').textContent = 'owner: you'; } }
+  // the comparison flips row by row
+  { const sec = $('#see'), r = sec.getBoundingClientRect();
+    const p = innerWidth > 980 ? clamp(-r.top / (r.height - innerHeight)) : clamp((innerHeight * 0.7 - r.top) / (r.height));
+    rows.forEach((row, i) => { const on = p > 0.1 + i * 0.15; if (on !== row.classList.contains('flip')) { row.classList.toggle('flip', on); const b = $('b.w', row); if (on) scramble(b, b.dataset.t || b.textContent, 600); } }); }
+  // kinetic type runs with your scroll
+  if (Math.abs(v) > 0.5) kdir = v > 0 ? 1 : -1;
+  const sp = 0.7 + Math.min(14, Math.abs(vS) * 0.35);
+  kx1 -= sp * kdir; kx2 += sp * kdir;
+  const w1 = $('#kin1').scrollWidth / 6, w2 = $('#kin2').scrollWidth / 8;
+  if (w1) $('#kin1').style.transform = `translateX(${((kx1 % w1) - w1)}px)`;
+  if (w2) $('#kin2').style.transform = `translateX(${((kx2 % w2) - w2 * 2)}px)`;
+  // cursor ring
+  if (fine) { ccx += (ctx2 - ccx) * 0.18; ccy += (cty2 - ccy) * 0.18; curEl.style.transform = `translate(${ccx}px, ${ccy}px)`; }
+})();
