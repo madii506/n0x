@@ -15,17 +15,16 @@
 <link rel="icon" type="image/png" sizes="64x64" href="/img/fav-64.png">
 <link rel="apple-touch-icon" href="/img/fav-180.png">
 <link rel="preload" href="/fonts/id-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/n0x.css?v=2">
+<link rel="stylesheet" href="/css/n0x.css?v=3">
 </head>
 <body>
 <div id="intro" aria-hidden="true">
   <div class="in-n"><img src="/img/n.png" alt=""></div>
   <div class="in-line"><span id="inType"></span><i class="caret"></i></div>
-  <div class="in-bar"><i id="inBar"></i></div>
   <button class="in-skip" id="inSkip" type="button">Skip</button>
 </div>
 
-<i id="prog"></i><div class="grain" id="grain"></div>
+<i id="prog"></i><div id="cur" aria-hidden="true"></div><div class="grain" id="grain"></div>
 <canvas id="scene"></canvas>
 <div class="veil" id="veil"></div>
 
@@ -106,6 +105,8 @@
   </div>
 </section>
 
+<section class="inter" id="inter1" aria-hidden="true"><p class="big">Your position stays public. Your name doesn’t.</p></section>
+
 <section id="how" class="band pin">
   <div class="pin-in">
     <div class="wrap two">
@@ -151,7 +152,7 @@
   </div>
 </section>
 
-<section id="see" class="band">
+<section id="see" class="band pin2"><div class="pin-in">
   <div class="wrap">
     <p class="eb">05 — What a tracker sees</p>
     <h2 class="rv">The same position, looked up twice.</h2>
@@ -164,6 +165,11 @@
       <div class="vr"><span>Label</span><b>you</b><b class="w">a fresh account</b></div>
     </div>
   </div>
+</div></section>
+
+<section class="inter kin" id="inter2" aria-hidden="true">
+  <div class="kin-row" id="kin1"></div>
+  <div class="kin-row stroke" id="kin2"></div>
 </section>
 
 <section id="terminal" class="band term">
@@ -295,6 +301,6 @@
 
 <div id="wModal" class="modal" hidden><div class="mbox"><div class="ph"><span>CONNECT A SOLANA WALLET</span><button type="button" id="wClose" aria-label="Close">×</button></div><div id="wPick" class="pb"></div></div></div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script type="module" src="/js/n0x.js?v=2"></script>
+<script type="module" src="/js/n0x.js?v=3"></script>
 </body>
 </html>
