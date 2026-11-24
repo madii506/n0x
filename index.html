@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="64x64" href="/img/fav-64.png">
 <link rel="apple-touch-icon" href="/img/fav-180.png">
 <link rel="preload" href="/fonts/id-600.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="/css/n0x.css?v=3">
+<link rel="stylesheet" href="/css/n0x.css?v=5">
 </head>
 <body>
 <div id="intro" aria-hidden="true">
@@ -31,7 +31,7 @@
 <nav id="nav">
   <span></span>
   <div class="links">
-    <a href="#problem">Problem</a><a href="#how">How</a><a href="#route">Route</a><a href="#terminal">Terminal</a><a href="#safety">Safety</a><a href="#faq">FAQ</a>
+    <a href="#problem">Problem</a><a href="#how">How</a><a href="#route">Route</a><a href="#tech">Tech</a><a href="#terminal">Terminal</a><a href="#safety">Safety</a><a href="#faq">FAQ</a>
   </div>
   <span></span>
 </nav>
@@ -42,6 +42,7 @@
     <h1 class="hero-h">The privacy layer for perps.</h1>
     <p class="hero-p">Trade Hyperliquid from a fresh account with no onchain link to your wallet.</p>
     <div class="ctas"><a class="btn pri" href="#terminal">Open terminal</a><a class="btn" href="#how">How it works</a></div>
+    <div class="live-strip" id="liveStrip"><span><i></i><b id="lsMk">—</b>&nbsp;perps markets live</span><span>BTC&nbsp;<b id="lsBtc">—</b></span><span>1 SOL routes to&nbsp;<b id="lsRt">—</b>&nbsp;USDC</span><span>n0x fee&nbsp;<b>0%</b></span></div>
     <div class="ca" id="caBox" hidden><span class="mono">CA</span><code id="caTxt"></code><button type="button" id="caCopy">Copy</button></div>
   </div>
   <a class="cue" href="#problem"><span>Scroll</span><i></i></a>
@@ -49,7 +50,7 @@
 
 <main>
 <div class="ticker" id="ticker" hidden><span class="tk-live"><i></i>LIVE · HYPERLIQUID</span><div class="tk-view"><div class="tk-track" id="tkTrack"></div></div></div>
-<section id="problem" class="band">
+<section id="problem" class="band"><span class="ghost" aria-hidden="true">01</span>
   <div class="wrap two">
     <div>
       <p class="eb">01 — Every position is public</p>
@@ -83,10 +84,23 @@
   </div>
 </section>
 
-<section id="break" class="band dim">
+<section id="hunt" class="band dim"><span class="ghost" aria-hidden="true">02</span>
+  <div class="wrap">
+    <p class="eb">02 — How you get hunted</p>
+    <h2 class="rv">Three ways a public position gets hunted.</h2>
+    <p class="lead">Hyperliquid is fully onchain. That’s great for fairness and terrible for privacy. Here’s what happens when your account has a name on it.</p>
+    <div class="cards3">
+      <article class="hc tilt clip"><canvas class="hcv" data-kind="liq"></canvas><h3>The liquidation hunt</h3><p>Your liquidation price is public. When it sits close to the market it becomes a magnet: price gets pushed into it, your position is closed, and the move reverses without you.</p><span class="tag red">stops taken</span></article>
+      <article class="hc tilt clip"><canvas class="hcv" data-kind="copy"></canvas><h3>The copy-trade drain</h3><p>Known accounts get mirrored within seconds. Bots front-run your entries, and when you exit, everyone who copied you is already selling into the same book.</p><span class="tag">edge copied</span></article>
+      <article class="hc tilt clip"><canvas class="hcv" data-kind="doxx"></canvas><h3>The doxx</h3><p>One deposit from a known wallet links everything: your other coins, your past trades, your exchange deposits. Trackers label the account and post it for everyone.</p><span class="tag">name attached</span></article>
+    </div>
+  </div>
+</section>
+
+<section id="break" class="band dim"><span class="ghost" aria-hidden="true">03</span>
   <div class="wrap two rev">
     <div>
-      <p class="eb">02 — n0x breaks the link</p>
+      <p class="eb">03 — n0x breaks the link</p>
       <h2 class="rv">Same trade. Same venue. Nobody’s name on it.</h2>
       <p class="lead rv">n0x opens your position from a brand-new Hyperliquid account. It is funded through NEAR Intents, so the money arrives from a solver, not from you. The position is still public. What’s gone is the line back to your wallet.</p>
       <div class="pill-row rv"><span>No shared address</span><span>No bridge from your wallet</span><span>Key never leaves your browser</span></div>
@@ -111,7 +125,7 @@
   <div class="pin-in">
     <div class="wrap two">
       <div>
-        <p class="eb">03 — How it works</p>
+        <p class="eb">04 — How it works</p>
         <h2 class="rv">Four steps. All of them in your browser.</h2>
         <ol class="slist" id="slist">
           <li class="on"><b>01</b><div><h3>Make a fresh account</h3><p>A new Hyperliquid key is created on this page. It is stored in this browser only, and n0x never sees it. Back it up with one click.</p></div></li>
@@ -131,9 +145,9 @@
   </div>
 </section>
 
-<section id="route" class="band dim">
+<section id="route" class="band dim"><span class="ghost" aria-hidden="true">05</span>
   <div class="wrap">
-    <p class="eb">04 — The route, in detail</p>
+    <p class="eb">05 — The route, in detail</p>
     <h2 class="rv">Your SOL goes in one door. USDC comes out another.</h2>
     <div class="flow rv"><i class="pk"></i>
       <div class="fn"><b>Your wallet</b><span>Solana</span><em>Sends SOL to a one-time deposit address</em></div>
@@ -154,7 +168,7 @@
 
 <section id="see" class="band pin2"><div class="pin-in">
   <div class="wrap">
-    <p class="eb">05 — What a tracker sees</p>
+    <p class="eb">06 — What a tracker sees</p>
     <h2 class="rv">The same position, looked up twice.</h2>
     <div class="vs rv">
       <div class="vh"><span></span><b>Without n0x</b><b class="w">With n0x</b></div>
@@ -167,6 +181,49 @@
   </div>
 </div></section>
 
+<section id="tech" class="band"><span class="ghost" aria-hidden="true">07</span>
+  <div class="wrap two">
+    <div>
+      <p class="eb">07 — Under the hood</p>
+      <h2 class="rv">No server holds a key. Here’s exactly what runs where.</h2>
+      <div class="where">
+        <h4>In your browser</h4>
+        <ul>
+          <li><b>Key generation.</b> A secp256k1 key from your browser’s own crypto RNG. It’s a standard EVM key, so any EVM wallet can import it.</li>
+          <li><b>Order signing.</b> EIP-712 typed data, the same scheme as Hyperliquid’s official SDK. We checked our signatures against it byte for byte.</li>
+          <li><b>Funding.</b> Your Solana wallet signs one plain SOL transfer to the one-time deposit address. Nothing else.</li>
+        </ul>
+        <h4>On the n0x server</h4>
+        <ul>
+          <li><b>Relays only.</b> Public Hyperliquid reads, actions you already signed, and NEAR Intents quotes and status.</li>
+          <li><b>Remembers nothing.</b> No database, no accounts, no cookies, no analytics. A strict content policy blocks every third-party script.</li>
+        </ul>
+      </div>
+    </div>
+    <div class="log tilt" id="techLog" aria-label="What happens when you trade">
+      <div class="ph"><span>SESSION LOG</span><i></i></div>
+      <pre id="logPre"></pre>
+    </div>
+  </div>
+</section>
+
+<section id="playbook" class="band dim hz">
+  <div class="hz-in">
+    <div class="wrap hz-head">
+      <p class="eb">08 — The privacy playbook</p>
+      <h2 class="rv">Six habits that keep the link broken.</h2>
+    </div>
+    <div class="hz-track" id="hzTrack">
+      <article class="pb-card"><b>01</b><h3>Fund in odd amounts</h3><p>Send 3.17 SOL, not 3.00. Round numbers and exact matches are the easiest thing to pair up.</p></article>
+      <article class="pb-card"><b>02</b><h3>Let time pass</h3><p>Don’t trade the minute the USDC lands. A deposit at 14:02 and a 20x long at 14:03 is a pattern.</p></article>
+      <article class="pb-card"><b>03</b><h3>One account per idea</h3><p>Accounts are free. Spread separate theses across separate fresh accounts instead of stacking them.</p></article>
+      <article class="pb-card"><b>04</b><h3>Never send it home</h3><p>One transfer from a fresh account to your main wallet undoes everything. Don’t make it, ever.</p></article>
+      <article class="pb-card"><b>05</b><h3>Exit somewhere new</h3><p>Withdraw to a new address you’ve never used, and keep it apart from your main wallet too.</p></article>
+      <article class="pb-card"><b>06</b><h3>Mind the screenshots</h3><p>Posting your PnL card is the fastest way to tie the account back to you. Flex without the address.</p></article>
+    </div>
+  </div>
+</section>
+
 <section class="inter kin" id="inter2" aria-hidden="true">
   <div class="kin-row" id="kin1"></div>
   <div class="kin-row stroke" id="kin2"></div>
@@ -174,7 +231,7 @@
 
 <section id="terminal" class="band term">
   <div class="wrap">
-    <p class="eb">06 — Terminal</p>
+    <p class="eb">09 — Terminal</p>
     <h2 class="rv">Trade from the dark.</h2>
     <div class="tgrid">
       <div class="panel" id="pAcct">
@@ -236,9 +293,9 @@
   </div>
 </section>
 
-<section id="limits" class="band dim">
+<section id="limits" class="band dim"><span class="ghost" aria-hidden="true">10</span>
   <div class="wrap">
-    <p class="eb">07 — Fees and limits</p>
+    <p class="eb">10 — Fees and limits</p>
     <h2 class="rv">What it costs, in plain numbers.</h2>
     <div class="spec rv">
       <div><span>n0x fee</span><b>None</b></div>
@@ -253,10 +310,10 @@
   </div>
 </section>
 
-<section id="safety" class="band">
+<section id="safety" class="band"><span class="ghost" aria-hidden="true">11</span>
   <div class="wrap two">
     <div>
-      <p class="eb">08 — Honest limits</p>
+      <p class="eb">11 — Honest limits</p>
       <h2 class="rv">Private isn’t invisible. Here’s the difference.</h2>
       <p class="lead rv">n0x removes the onchain link between your wallet and your position. It doesn’t make the position disappear, and it can’t stop someone matching amounts and times.</p>
     </div>
@@ -271,9 +328,26 @@
   </div>
 </section>
 
-<section id="faq" class="band dim">
+<section id="glossary" class="band"><span class="ghost" aria-hidden="true">12</span>
   <div class="wrap">
-    <p class="eb">09 — FAQ</p>
+    <p class="eb">12 — Glossary</p>
+    <h2 class="rv">The words, in plain English.</h2>
+    <dl class="gloss">
+      <div class="clip"><dt>Perps</dt><dd>Perpetual futures. Bets on a price going up or down, with leverage and no expiry date.</dd></div>
+      <div class="clip"><dt>Liquidation price</dt><dd>The price where your margin runs out and the position is closed for you. On Hyperliquid, anyone can see it.</dd></div>
+      <div class="clip"><dt>Leverage</dt><dd>Trading a bigger size than your balance. 20x means $100 of margin moves like $2,000.</dd></div>
+      <div class="clip"><dt>Fresh account</dt><dd>A brand-new Hyperliquid address made in your browser, with no history and no link to your wallets.</dd></div>
+      <div class="clip"><dt>Deposit address</dt><dd>A one-time address NEAR Intents creates for your swap. You send SOL there, and it’s never reused.</dd></div>
+      <div class="clip"><dt>Solver</dt><dd>A market maker on NEAR Intents that pays out the USDC from its own balance and takes your SOL in return.</dd></div>
+      <div class="clip"><dt>Trading balance</dt><dd>The USDC in a Hyperliquid account that backs your positions. The route pays straight into it.</dd></div>
+      <div class="clip"><dt>Onchain link</dt><dd>A direct transfer between two addresses that anyone can follow. n0x funds accounts without one.</dd></div>
+    </dl>
+  </div>
+</section>
+
+<section id="faq" class="band dim"><span class="ghost" aria-hidden="true">13</span>
+  <div class="wrap">
+    <p class="eb">13 — FAQ</p>
     <h2 class="rv">Questions</h2>
     <div class="faq rv">
       <details><summary>Does n0x hold my money?</summary><p>No. The fresh account’s key is created and kept in your browser. n0x’s server only relays public data and actions you’ve already signed. It can’t move funds.</p></details>
@@ -283,6 +357,11 @@
       <details><summary>Which markets can I trade?</summary><p>Every live Hyperliquid perp market, from BTC, ETH and SOL to HYPE and the long tail. Leverage goes up to each market’s own maximum.</p></details>
       <details><summary>Does n0x take a fee?</summary><p>No. You pay the route fee shown in the quote and Hyperliquid’s normal trading and withdrawal fees.</p></details>
       <details><summary>What if I clear my browser?</summary><p>The key goes with it. Use “Back up key” right after you make an account, and “Import key” to bring it back on any device.</p></details>
+      <details><summary>Can I use it on my phone?</summary><p>Yes. The terminal works in mobile browsers. To fund it in one tap, open the site inside your wallet app’s browser, or copy the deposit address and pay it from any wallet.</p></details>
+      <details><summary>Which wallets can fund the route?</summary><p>Any Solana wallet that supports the Wallet Standard, like Phantom, Solflare or Backpack. You can also send the SOL from an exchange or any other wallet to the deposit address.</p></details>
+      <details><summary>How long does funding take?</summary><p>Usually under a minute. Each quote shows its own time estimate before you send anything, and the terminal tracks the route until the USDC lands.</p></details>
+      <details><summary>Can I open the account in another app?</summary><p>Yes. The fresh account is a standard EVM private key. Back it up, import it into an EVM wallet and you can use it on Hyperliquid’s own site too.</p></details>
+      <details><summary>Does holding $N0X matter for the terminal?</summary><p>No. The terminal is free to use and doesn’t check what you hold.</p></details>
       <details><summary>Is this a mixer?</summary><p>No. Nothing is pooled. It’s a normal cross-chain swap that pays into a new account. It removes the direct link, but it doesn’t promise anonymity.</p></details>
     </div>
   </div>
@@ -292,7 +371,7 @@
   <div class="wrap center">
     <img class="end-n rv" src="/img/n.png" alt="">
     <h2 class="rv">They can’t hunt what they can’t see.</h2>
-    <p class="lead rv" id="tokLine">$N0X. The contract address goes here at launch.</p>
+    <p class="lead rv" id="tokLine">$N0X is the coin behind n0x. The terminal is free and doesn’t ask you to hold anything. The contract address goes here at launch.</p>
     <div class="ca big rv" id="caBox2" hidden><span class="mono">CA</span><code id="caTxt2"></code><button type="button" id="caCopy2">Copy</button></div>
     <div class="ctas rv"><a class="btn pri" href="#terminal">Open terminal</a><a class="btn" id="xLink" href="#" hidden target="_blank" rel="noopener">X</a></div>
   </div>
@@ -301,6 +380,6 @@
 
 <div id="wModal" class="modal" hidden><div class="mbox"><div class="ph"><span>CONNECT A SOLANA WALLET</span><button type="button" id="wClose" aria-label="Close">×</button></div><div id="wPick" class="pb"></div></div></div>
 <div id="toast" role="status" aria-live="polite"></div>
-<script type="module" src="/js/n0x.js?v=4"></script>
+<script type="module" src="/js/n0x.js?v=5"></script>
 </body>
 </html>
