@@ -59,7 +59,6 @@ api('config').then(c => {
   if (c.ca) for (const [b, t, k] of [['#caBox', '#caTxt', '#caCopy'], ['#caBox2', '#caTxt2', '#caCopy2']]) {
     $(t).textContent = c.ca; $(b).hidden = false; $(k).onclick = () => { navigator.clipboard.writeText(c.ca); toast('Contract address copied'); };
   }
-  if (c.ca) $('#tokLine').textContent = '$N0X';
   if (c.x) { $('#xLink').href = c.x; $('#xLink').hidden = false; }
 }).catch(() => { });
 
