@@ -42,6 +42,17 @@ module.exports = async (req, res) => {
       return out(res, 200, await rpc(b.method, Array.isArray(b.params) ? b.params : []));
     }
 
+    // a live, dry quote for the hero: what 1 SOL routes to right now (no deposit address is created)
+    if (p === 'peek') {
+      const q = { dry: true, swapType: 'EXACT_INPUT', slippageTolerance: 100, originAsset: SOL, depositType: 'ORIGIN_CHAIN', destinationAsset: HL_USDC, amount: '1000000000',
+        refundTo: 'So11111111111111111111111111111111111111112', refundType: 'ORIGIN_CHAIN', recipient: '0x000000000000000000000000000000000000dEaD', recipientType: 'DESTINATION_CHAIN',
+        deadline: new Date(Date.now() + 10 * 60 * 1000).toISOString(), referral: 'n0x', quoteWaitingTimeMs: 2000 };
+      const r = await fetch(`${ONECLICK}/quote`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(q) });
+      const j = await r.json().catch(() => ({})); const qq = j.quote || {};
+      if (!r.ok || !qq.amountOutFormatted) return out(res, 502, { ok: false, error: 'no quote right now' });
+      return out(res, 200, { ok: true, out: qq.amountOutFormatted, time: qq.timeEstimate || null }, 's-maxage=60, stale-while-revalidate=120');
+    }
+
     // the private route: SOL in at a one-time address, USDC out into the fresh account's Hyperliquid balance
     if (p === 'route') {
       if (req.method === 'GET') {
