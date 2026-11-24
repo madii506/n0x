@@ -399,3 +399,86 @@ let lastY = scrollY, vS = 0, skew = 0;
   // cursor ring
   if (fine) { ccx += (ctx2 - ccx) * 0.18; ccy += (cty2 - ccy) * 0.18; curEl.style.transform = `translate(${ccx}px, ${ccy}px)`; }
 })();
+
+/* ===== v5: more to read, more to watch ===== */
+// count-ups for the live strip (real numbers only)
+function countTo(el, to, dec = 0, ms = 1400) {
+  const t0 = performance.now();
+  (function f() { const k = Math.min(1, (performance.now() - t0) / ms), e = 1 - Math.pow(1 - k, 3); el.textContent = fmt(to * e, dec); if (k < 1) requestAnimationFrame(f); })();
+}
+(async () => {
+  try { const m = await H.meta(); countTo($('#lsMk'), m.length, 0); const b = m.find(x => x.name === 'BTC'); if (b) countTo($('#lsBtc'), Number(b.ctx.markPx), 0, 1700); } catch (e) { }
+  try { const q = await api('peek'); countTo($('#lsRt'), Number(q.out), 2, 1800); } catch (e) { $('#lsRt').textContent = '—'; }
+})();
+// wipe-ins and the drifting numbers
+$$('.cards3, .gloss').forEach(el => io.observe(el));   // observe the containers: a fully clipped card never intersects
+const ghosts = $$('.ghost');
+// cards lean toward the cursor
+if (fine) $$('.tilt').forEach(c => {
+  c.addEventListener('pointermove', e => { const r = c.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - 0.5, y = (e.clientY - r.top) / r.height - 0.5; c.style.transform = `perspective(900px) rotateY(${x * 9}deg) rotateX(${-y * 7}deg) translateZ(0)`; });
+  c.addEventListener('pointerleave', () => { c.style.transform = ''; });
+});
+// the hunt, drawn live
+const HC = $$('.hcv').map(cv => ({ cv, kind: cv.dataset.kind, on: false, t: Math.random() * 3 }));
+const hio = new IntersectionObserver(es => es.forEach(e => { const h = HC.find(x => x.cv === e.target); if (h) h.on = e.isIntersecting; }), { threshold: 0.05 });
+HC.forEach(h => hio.observe(h.cv));
+function drawHunt(h, dt) {
+  const cv = h.cv, d = Math.min(2, devicePixelRatio || 1), W = cv.clientWidth, Hh = cv.clientHeight;
+  if (cv.width !== Math.round(W * d)) { cv.width = Math.round(W * d); cv.height = Math.round(Hh * d); }
+  const x = cv.getContext('2d'); x.setTransform(d, 0, 0, d, 0, 0); x.clearRect(0, 0, W, Hh); h.t += dt;
+  x.strokeStyle = 'rgba(255,255,255,.045)'; x.lineWidth = 1; for (let i = 1; i < 5; i++) { x.beginPath(); x.moveTo(0, Hh * i / 5); x.lineTo(W, Hh * i / 5); x.stroke(); }
+  x.font = '600 10px ui-monospace, monospace'; x.textBaseline = 'middle';
+  if (h.kind === 'liq') {
+    const T = 6.5, k = (h.t % T) / T, liqY = Hh * 0.74, N = 90, pts = [];
+    for (let i = 0; i <= N; i++) { const u = i / N; let y = Hh * 0.34 + Math.sin(u * 13 + 1.3) * 7 + Math.sin(u * 31) * 3 + u * Hh * 0.18; if (u > 0.62 && u < 0.72) y += Math.sin((u - 0.62) / 0.1 * Math.PI) * (liqY - y + 6); if (u >= 0.72) y -= (u - 0.72) * Hh * 0.9; pts.push([u * W, y]); }
+    x.setLineDash([5, 5]); x.strokeStyle = 'rgba(232,98,106,.8)'; x.beginPath(); x.moveTo(0, liqY); x.lineTo(W, liqY); x.stroke(); x.setLineDash([]);
+    x.fillStyle = 'rgba(232,98,106,.9)'; x.fillText('YOUR LIQ', 8, liqY - 10);
+    const n = Math.max(2, Math.floor(k * N)); x.strokeStyle = '#eceef1'; x.lineWidth = 1.6; x.beginPath(); pts.slice(0, n).forEach((p, i) => i ? x.lineTo(p[0], p[1]) : x.moveTo(p[0], p[1])); x.stroke();
+    const hp = pts[n - 1]; x.fillStyle = '#fff'; x.beginPath(); x.arc(hp[0], hp[1], 3, 0, 7); x.fill();
+    if (k > 0.66 && k < 0.8) { x.fillStyle = `rgba(232,98,106,${1 - (k - 0.66) / 0.14})`; x.font = '700 13px ui-monospace, monospace'; x.fillText('LIQUIDATED', W * 0.62, liqY + 18); }
+  } else if (h.kind === 'copy') {
+    const path = u => Hh * 0.55 + Math.sin(u * 9 + h.t * 0.9) * Hh * 0.17 + Math.sin(u * 23 + h.t * 1.7) * 6;
+    for (let c = 5; c >= 0; c--) {
+      x.strokeStyle = c ? `rgba(150,156,168,${0.5 - c * 0.07})` : '#eceef1'; x.lineWidth = c ? 1 : 1.8; x.beginPath();
+      for (let i = 0; i <= 80; i++) { const u = i / 80, X = u * W - c * 9; const y = path(u - c * 0.02) + c * 3; i ? x.lineTo(X, y) : x.moveTo(X, y); }
+      x.stroke();
+    }
+    x.fillStyle = '#eceef1'; x.fillText('YOU', W - 40, path(1) - 14); x.fillStyle = 'rgba(150,156,168,.8)'; x.fillText('COPIERS', 8, 16);
+  } else {
+    const T = 7, k = (h.t % T) / T, cx = W / 2, cy = Hh / 2, labs = ['main wallet', 'cex deposit', 'old airdrop', 'nft buys', 'past trades', 'bridge'];
+    labs.forEach((l, i) => {
+      const a = i / labs.length * Math.PI * 2 + 0.4, R = Math.min(W, Hh) * 0.38, px = cx + Math.cos(a) * R * 1.55, py = cy + Math.sin(a) * R, ki = Math.max(0, Math.min(1, (k - i * 0.1) / 0.12));
+      if (ki <= 0) return;
+      x.strokeStyle = `rgba(232,98,106,${0.75 * ki})`; x.lineWidth = 1; x.beginPath(); x.moveTo(cx, cy); x.lineTo(cx + (px - cx) * ki, cy + (py - cy) * ki); x.stroke();
+      x.fillStyle = `rgba(13,14,17,${ki})`; x.strokeStyle = `rgba(80,85,95,${ki})`; x.beginPath(); x.arc(px, py, 5, 0, 7); x.fill(); x.stroke();
+      x.fillStyle = `rgba(160,166,176,${ki})`; x.fillText(l, px + (px > cx ? 9 : -9 - x.measureText(l).width), py);
+    });
+    x.fillStyle = k > 0.62 ? '#e8626a' : '#eceef1'; x.beginPath(); x.arc(cx, cy, 9, 0, 7); x.fill();
+    if (k > 0.62) { x.fillStyle = '#e8626a'; x.font = '700 11px ui-monospace, monospace'; x.fillText('LABELED: YOU', cx - 40, cy + 24); }
+  }
+}
+// the session log types itself as you scroll
+const LOG = [
+  ['k', '$ n0x session'], ['w', '> key     made in browser   0x7c3a…e91f'], ['k', '  never sent anywhere'],
+  ['w', '> route   quote 1.00 SOL → USDC'], ['k', '  deposit to one-time address 9Fq…k2'], ['g', '  arrived · trading balance credited'],
+  ['w', '> sign    order BTC long 20x'], ['k', '  EIP-712 · phantom agent · v=27'], ['w', '> relay   POST /exchange'], ['g', '  status ok · filled'],
+  ['w', '> server  saw a signature'], ['r', '          never saw the key'],
+];
+const logTotal = LOG.reduce((s, l) => s + l[1].length + 1, 0);
+let logShown = -1;
+function renderLog(n) {
+  if (n === logShown) return; logShown = n; let left = n, html = '';
+  for (const [c, t] of LOG) { if (left <= 0) break; const part = t.slice(0, left); left -= t.length + 1; html += `<span class="${c}">${part.replace(/</g, '&lt;')}</span>\n`; }
+  $('#logPre').innerHTML = html + '<span class="cursor"></span>';
+}
+const hz = $('#playbook'), hzT = $('#hzTrack');
+let lastT5 = performance.now();
+(function loop5(now) {
+  requestAnimationFrame(loop5);
+  const dt = Math.min(0.05, (now - lastT5) / 1000); lastT5 = now;
+  for (const g of ghosts) { const r = g.parentElement.getBoundingClientRect(); if (r.bottom < 0 || r.top > innerHeight) continue; g.style.transform = `translateY(${-r.top * 0.22}px)`; }
+  for (const h of HC) if (h.on && !document.hidden) drawHunt(h, dt);
+  { const r = $('#tech').getBoundingClientRect(); const p = clamp((innerHeight * 0.85 - r.top) / (r.height * 0.75)); renderLog(Math.round(p * logTotal)); }
+  if (innerWidth > 980) { const r = hz.getBoundingClientRect(), p = clamp(-r.top / (r.height - innerHeight)); const max = hzT.scrollWidth - innerWidth + 40; hzT.style.transform = `translateX(${-p * Math.max(0, max)}px)`; }
+  else hzT.style.transform = '';
+})(performance.now());
