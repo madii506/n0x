@@ -45,7 +45,7 @@ module.exports = async (req, res) => {
     // a live, dry quote for the hero: what 1 SOL routes to right now (no deposit address is created)
     if (p === 'peek') {
       const q = { dry: true, swapType: 'EXACT_INPUT', slippageTolerance: 100, originAsset: SOL, depositType: 'ORIGIN_CHAIN', destinationAsset: HL_USDC, amount: '1000000000',
-        refundTo: 'So11111111111111111111111111111111111111112', refundType: 'ORIGIN_CHAIN', recipient: '0x000000000000000000000000000000000000dEaD', recipientType: 'DESTINATION_CHAIN',
+        refundTo: 'So11111111111111111111111111111111111111112', refundType: 'ORIGIN_CHAIN', recipient: '0x8f1c4b2a9d3e7f6051c2a8b9e4d7f3a6c1b5e902', recipientType: 'DESTINATION_CHAIN',
         deadline: new Date(Date.now() + 10 * 60 * 1000).toISOString(), referral: 'n0x', quoteWaitingTimeMs: 2000 };
       const r = await fetch(`${ONECLICK}/quote`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(q) });
       const j = await r.json().catch(() => ({})); const qq = j.quote || {};
