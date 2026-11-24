@@ -17,7 +17,7 @@ export async function createScene(canvas, { mobile }) {
   const FOV = mobile ? 58 : 40;
   const cam = new THREE.PerspectiveCamera(FOV, innerWidth / innerHeight, 0.05, 90);
   const loader = new THREE.TextureLoader(), tex = {};
-  await Promise.all([...new Set(LAYOUT.map(l => l[0]))].map(n => new Promise(r => loader.load(`/img/w-${n}.webp`, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; tex[n] = t; r(); }, undefined, () => r()))));
+  await Promise.all([...new Set(LAYOUT.map(l => l[0]))].map(n => new Promise(r => loader.load(`/img/w-${n}.webp?v=2`, t => { t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = 4; tex[n] = t; r(); }, undefined, () => r()))));
 
   const wins = [], reps = mobile ? 5 : 10;
   const spread = () => mobile ? 0.72 : Math.max(1, Math.min(1.45, innerWidth / innerHeight / 1.2));

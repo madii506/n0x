@@ -27,7 +27,7 @@ function endIntro() {
 }
 function boot() {
   document.body.classList.add('lock');
-  import('./scene.js').then(m => m.createScene($('#scene'), { mobile })).then(s => { scene = s; window.__n0x = s; if (introDone) s.intro(); }).catch(() => { });
+  import('./scene.js?v=4').then(m => m.createScene($('#scene'), { mobile })).then(s => { scene = s; window.__n0x = s; if (introDone) s.intro(); }).catch(() => { });
   if (reduce || location.hash) { endIntro(); return; }
   const t0 = performance.now(), DUR = 2700, el = $('#inType');
   (function tick() {
