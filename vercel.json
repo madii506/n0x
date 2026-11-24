@@ -1,0 +1,13 @@
+{
+  "cleanUrls": true,
+  "functions": { "api/n0x.js": { "maxDuration": 30 } },
+  "rewrites": [{ "source": "/api/:path*", "destination": "/api/n0x?__p=:path*" }],
+  "headers": [
+    { "source": "/(.*)", "headers": [
+      { "key": "Content-Security-Policy", "value": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'" },
+      { "key": "Referrer-Policy", "value": "no-referrer" },
+      { "key": "X-Content-Type-Options", "value": "nosniff" }
+    ] },
+    { "source": "/(fonts|vendor|img)/(.*)", "headers": [{ "key": "Cache-Control", "value": "public, max-age=604800" }] }
+  ]
+}
